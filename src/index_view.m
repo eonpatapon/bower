@@ -2207,13 +2207,11 @@ draw_index_line(IAttrs, AuthorWidth, Screen, Panel, Line, _LineNr, IsCursor,
 
     % Draw non-standard tags, overlapping up to half of the subject.
     ( NonstdTagsWidth > 0 ->
-        getyx(Screen, Panel, _, SubjectX, !IO),
         getmaxyx(Screen, Panel, _, MaxX, !IO),
         (
-            MaxX - SubjectX < NonstdTagsWidth,
-            SubjectMidX = (MaxX + SubjectX0)/2,
-            MoveX = max(SubjectMidX, MaxX - NonstdTagsWidth),
-            MoveX < SubjectX
+            SubjectMidX = SubjectX0 + length(Subject) / 2,
+            MaxX - SubjectMidX > NonstdTagsWidth,
+            MoveX = max(SubjectMidX, MaxX - NonstdTagsWidth)
         ->
             move(Screen, Panel, Row, MoveX, !IO)
         ;

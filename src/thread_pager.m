@@ -2968,7 +2968,7 @@ draw_thread_line(TAttrs, ObscureMode, Screen, Panel, Line, _LineNr, IsCursor,
         draw(Screen, Panel, "(excluded) ", !IO)
     ),
 
-    getyx(Screen, Panel, Row, FromStartX, !IO),
+    getyx(Screen, Panel, Row, _, !IO),
     (
         Unread = unread,
         Highlight = curs.bold
@@ -2983,7 +2983,8 @@ draw_thread_line(TAttrs, ObscureMode, Screen, Panel, Line, _LineNr, IsCursor,
         draw(Screen, Panel, ". ", !IO),
         mattr_draw(Screen, Panel, MaybeAttr(Attrs ^ subject), Subject, !IO)
     ;
-        MaybeSubject = no
+        MaybeSubject = no,
+        Subject = ""
     ),
     getyx(Screen, Panel, _, SubjectEndX, !IO),
     getmaxyx(Screen, Panel, _, MaxX, !IO),
@@ -2991,9 +2992,9 @@ draw_thread_line(TAttrs, ObscureMode, Screen, Panel, Line, _LineNr, IsCursor,
     % Draw non-standard tags, overlapping from/subject text if necessary.
     ( NonstdTagsWidth > 0 ->
         (
-            NonstdTagsWidth > MaxX - SubjectEndX,
-            MoveX = max(FromStartX, MaxX - NonstdTagsWidth),
-            MoveX < SubjectEndX
+            SubjectMidX = SubjectEndX - length(Subject) / 2,
+            MaxX - SubjectMidX > NonstdTagsWidth,
+            MoveX = max(SubjectMidX, MaxX - NonstdTagsWidth)
         ->
             move(Screen, Panel, Row, MoveX, !IO)
         ;
